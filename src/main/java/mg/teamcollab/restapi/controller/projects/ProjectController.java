@@ -18,16 +18,16 @@ public class ProjectController {
         this.projectService = projectService;
     }
     @PostMapping
-    public Project createProject(@RequestBody ProjectCreateDTO dto) throws Exception {
+    public ResponseEntity<Project>  createProject(@RequestBody ProjectCreateDTO dto) throws Exception {
         if (dto == null) {
             throw new Exception("Payload required");
         }
-        return projectService.createProject(dto);
+        return ResponseEntity.ok(projectService.createProject(dto));
     }
 
     @GetMapping
-    public List<ProjectReadDTO> getAllProjects() {
-        return projectService.findProjects();
+    public ResponseEntity<List<ProjectReadDTO>>getAllProjects() {
+        return ResponseEntity.ok(projectService.findProjects());
     }
 
     @PutMapping("/{id}")
