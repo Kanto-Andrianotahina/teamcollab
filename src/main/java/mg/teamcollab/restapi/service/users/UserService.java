@@ -2,7 +2,11 @@ package mg.teamcollab.restapi.service.users;
 
 import lombok.RequiredArgsConstructor;
 import mg.teamcollab.restapi.dto.users.RegisterRequestDTO;
+import mg.teamcollab.restapi.dto.users.UpdatePasswordRequestDTO;
+import mg.teamcollab.restapi.dto.users.UpdateUserRequestDTO;
 import mg.teamcollab.restapi.dto.users.UserResponseDTO;
+import mg.teamcollab.restapi.exception.BadRequestException;
+import mg.teamcollab.restapi.exception.NotFoundException;
 import mg.teamcollab.restapi.model.roles.Role;
 import mg.teamcollab.restapi.model.users.User;
 import mg.teamcollab.restapi.repository.users.UserRepository;
@@ -19,14 +23,14 @@ public class UserService {
 
     public UserResponseDTO register(RegisterRequestDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email déjà utilisé : " + request.getEmail());
+            throw new BadRequestException("Email déjà utilisé : " + request.getEmail());
         }
 
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
-                .password(request.getPassword()) // sans encodage
-                .role(Role.MEMBER)           // par défaut
+                .password(request.getPassword())
+                .role(Role.MEMBER)
                 .build();
 
         return UserResponseDTO.from(userRepository.save(user));
@@ -41,8 +45,33 @@ public class UserService {
 
     public UserResponseDTO findById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + id));
+                .orElseThrow(() -> new NotFoundException("Utilisateur introuvable : " + id));
         return UserResponseDTO.from(user);
     }
 
+    public UserResponseDTO update(Long id, UpdateUserRequestDTO request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Utilisateur introuvable : " + id));
+
+        if (request.getUsername() != null) user.setUsername(request.getUsername());
+        if (request.getEmail() != null)    user.setEmail(request.getEmail());
+
+        return UserResponseDTO.from(userRepository.save(user));
+    }
+
+    public void updatePassword(Long id, UpdatePasswordRequestDTO request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Utilisateur introuvable : " + id));
+
+        if (!user.getPassword().equals(request.getOldPassword())) {
+            throw new BadRequestException("Ancien mot de passe incorrect");
+        }
+
+        if (user.getPassword().equals(request.getNewPassword())) {
+            throw new BadRequestException("Le nouveau mot de passe doit être différent de l'ancien");
+        }
+
+        user.setPassword(request.getNewPassword());
+        userRepository.save(user);
+    }
 }
