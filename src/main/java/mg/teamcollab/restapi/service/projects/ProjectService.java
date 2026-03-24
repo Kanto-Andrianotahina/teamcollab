@@ -23,7 +23,7 @@ public class ProjectService {
 
     public Project createProject(ProjectCreateDTO dto) throws Exception {
         if (dto == null) {
-            throw  new Exception("Payload Requis");
+            throw  new Exception("Payload required");
         }
         Project p = new Project();
         p.setName(dto.getName());
@@ -37,5 +37,18 @@ public class ProjectService {
                 .stream()
                 .map(projectMapper::toDTO)
                 .toList();
+    }
+    public ProjectReadDTO udpateProjectByKey(Long id, ProjectCreateDTO dto) throws Exception {
+        if (dto == null) {
+            throw  new Exception("Payload required");
+        }
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new Exception("Project Not Found"));
+
+        project.setName(dto.getName());
+        project.setDescription(dto.getDescription());
+        project.setOwnerId(dto.getOwner());
+        project.setCreatedAt(LocalDateTime.now());
+        return projectMapper.toDTO(projectRepository.save(project));
     }
 }
