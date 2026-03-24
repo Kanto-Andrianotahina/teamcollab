@@ -1,10 +1,11 @@
 package mg.teamcollab.restapi.dto.projects;
 
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
 
-public class ProjectReadDTO {
+public class ProjectReadDTO extends RepresentationModel<ProjectReadDTO> {
     @Setter
     public String name;
     @Setter

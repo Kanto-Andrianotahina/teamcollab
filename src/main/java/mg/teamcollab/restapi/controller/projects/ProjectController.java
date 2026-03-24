@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/projects")
 public class ProjectController {
@@ -43,4 +46,17 @@ public class ProjectController {
         projectService.deleteProjectByKey(id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProjectReadDTO> getProjectById(@PathVariable Long id) throws Exception {
+
+        ProjectReadDTO dto = projectService.findProjectById(id);
+
+        //HATEOAS links
+        dto.add(linkTo(methodOn(ProjectController.class).getProjectById(id)).withSelfRel());
+        dto.add(linkTo(methodOn(ProjectController.class).getAllProjects()).withRel("all-projects"));
+
+        return ResponseEntity.ok(dto);
+    }
+
 }

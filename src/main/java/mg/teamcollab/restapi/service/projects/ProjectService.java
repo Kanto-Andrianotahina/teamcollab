@@ -59,4 +59,10 @@ public class ProjectService {
                 .orElseThrow(() -> new Exception("Project Not Found"));
         projectRepository.delete(project);
     }
+    public ProjectReadDTO findProjectById(Long id) throws Exception {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new Exception("Project not found"));
+
+        return projectMapper.toDTO(project);
+    }
 }
