@@ -1,20 +1,23 @@
 package mg.teamcollab.restapi.model.users;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import mg.teamcollab.restapi.model.roles.Role;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+import java.util.Collection;
+import java.util.List;
 
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,5 +34,21 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     private Role role;
+
+    @Override
+    public String getUsername() { return email; }
+
+    @Override
+    public String getPassword() { return password; }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
+
+    public boolean isAccountNonExpired()  { return true; }
+    public boolean isAccountNonLocked()   { return true; }
+    public boolean isCredentialsNonExpired() { return true; }
+    public boolean isEnabled()            { return true; }
 
 }
