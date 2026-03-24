@@ -37,4 +37,10 @@ public class ProjectController {
         }
         return ResponseEntity.ok(projectService.udpateProjectByKey(id,dto));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProject(@PathVariable long id) throws Exception {
+        projectService.deleteProjectByKey(id);
+        return ResponseEntity.ok().build();
+    }
 }

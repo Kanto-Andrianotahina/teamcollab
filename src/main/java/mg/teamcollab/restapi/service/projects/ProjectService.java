@@ -51,4 +51,12 @@ public class ProjectService {
         project.setCreatedAt(LocalDateTime.now());
         return projectMapper.toDTO(projectRepository.save(project));
     }
+    public void deleteProjectByKey(Long id) throws Exception {
+        if (id == null) {
+            throw  new Exception("Payload required");
+        }
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new Exception("Project Not Found"));
+        projectRepository.delete(project);
+    }
 }
