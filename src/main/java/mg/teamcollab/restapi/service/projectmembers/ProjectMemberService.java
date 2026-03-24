@@ -35,10 +35,9 @@ public class ProjectMemberService {
         Project project = projectRepository.findById(dto.getProjectId())
                 .orElseThrow(() -> new Exception("Project not found"));
 
-        projectMemberRepository.findByUserIdAndProjectId(dto.getUserId(), dto.getProjectId())
-                .ifPresent(pm -> {
-                    throw new RuntimeException("User already member of this project");
-                });
+        if (projectMemberRepository.findByUserIdAndProjectId(dto.getUserId(), dto.getProjectId()).isPresent()) {
+            throw new Exception("User already member of this project");
+        }
 
         ProjectMember pm = new ProjectMember();
         pm.setUser(user);

@@ -1,5 +1,6 @@
 package mg.teamcollab.restapi.repository.projectmembers;
 
+import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberReadDTO;
 import mg.teamcollab.restapi.model.projectmembers.ProjectMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 

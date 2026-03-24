@@ -9,9 +9,7 @@ public class ProjectMemberReadDTO {
     @Setter @Getter
     private Long id;
     @Setter @Getter
-    private Long userId;
-    @Setter @Getter
-    private Long projectId;
+    private String userName;
     @Setter @Getter
     private String role;
     @Setter @Getter
