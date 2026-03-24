@@ -6,9 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import mg.teamcollab.restapi.model.roles.Role;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 
-import javax.sql.DataSource;
 
 @Entity
 @Data

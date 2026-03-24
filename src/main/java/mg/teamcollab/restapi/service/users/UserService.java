@@ -8,6 +8,9 @@ import mg.teamcollab.restapi.model.users.User;
 import mg.teamcollab.restapi.repository.users.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -27,6 +30,19 @@ public class UserService {
                 .build();
 
         return UserResponseDTO.from(userRepository.save(user));
+    }
+
+    public List<UserResponseDTO> findAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserResponseDTO::from)
+                .collect(Collectors.toList());
+    }
+
+    public UserResponseDTO findById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + id));
+        return UserResponseDTO.from(user);
     }
 
 }
