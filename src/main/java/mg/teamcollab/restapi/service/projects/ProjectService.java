@@ -1,6 +1,8 @@
 package mg.teamcollab.restapi.service.projects;
 
 import mg.teamcollab.restapi.dto.projects.ProjectCreateDTO;
+import mg.teamcollab.restapi.dto.projects.ProjectReadDTO;
+import mg.teamcollab.restapi.mapper.projects.ProjectMapper;
 import mg.teamcollab.restapi.model.projects.Project;
 import mg.teamcollab.restapi.repository.projects.ProjectRepository;
 import org.springframework.stereotype.Service;
@@ -12,9 +14,11 @@ import java.util.List;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final ProjectMapper projectMapper;
 
-    public ProjectService(ProjectRepository projectRepository) {
+    public ProjectService(ProjectRepository projectRepository, ProjectMapper projectMapper) {
         this.projectRepository = projectRepository;
+        this.projectMapper = projectMapper;
     }
 
     public Project createProject(ProjectCreateDTO dto) throws Exception {
@@ -28,7 +32,10 @@ public class ProjectService {
         p.setCreatedAt(LocalDateTime.now());
         return projectRepository.save(p);
     }
-    public List<Project> findProjects() {
-        return projectRepository.findAll();
+    public List<ProjectReadDTO> findProjects() {
+        return projectRepository.findAll()
+                .stream()
+                .map(projectMapper::toDTO)
+                .toList();
     }
 }
