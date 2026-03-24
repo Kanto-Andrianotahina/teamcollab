@@ -6,6 +6,7 @@ import mg.teamcollab.restapi.repository.projects.ProjectRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ProjectService {
@@ -20,12 +21,14 @@ public class ProjectService {
         if (dto == null) {
             throw  new Exception("Payload Requis");
         }
-
         Project p = new Project();
         p.setName(dto.getName());
         p.setDescription(dto.getDescription());
         p.setOwnerId(dto.getOwner());
         p.setCreatedAt(LocalDateTime.now());
         return projectRepository.save(p);
+    }
+    public List<Project> findProjects() {
+        return projectRepository.findAll();
     }
 }
