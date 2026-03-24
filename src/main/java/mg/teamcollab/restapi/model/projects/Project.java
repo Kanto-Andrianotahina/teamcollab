@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -14,13 +15,13 @@ public class Project
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Setter
+    @Setter @Getter
     private String name;
-    @Setter
+    @Setter @Getter
     private String description;
-    @Setter
+    @Setter  @Getter
     private LocalDateTime createdAt;
-    @Setter
+    @Setter  @Getter
     private Long ownerId;
 
 }
