@@ -4,6 +4,7 @@ import mg.teamcollab.restapi.dto.projects.ProjectCreateDTO;
 import mg.teamcollab.restapi.dto.projects.ProjectReadDTO;
 import mg.teamcollab.restapi.model.projects.Project;
 import mg.teamcollab.restapi.service.projects.ProjectService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class ProjectController {
     @PostMapping
     public Project createProject(@RequestBody ProjectCreateDTO dto) throws Exception {
         if (dto == null) {
-            throw new Exception("Payload requis");
+            throw new Exception("Payload required");
         }
         return projectService.createProject(dto);
     }
@@ -27,5 +28,13 @@ public class ProjectController {
     @GetMapping
     public List<ProjectReadDTO> getAllProjects() {
         return projectService.findProjects();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProjectReadDTO> updateProject(@PathVariable long id, @RequestBody ProjectCreateDTO dto) throws Exception {
+        if (dto == null) {
+            throw new Exception("Payload required");
+        }
+        return ResponseEntity.ok(projectService.udpateProjectByKey(id,dto));
     }
 }
