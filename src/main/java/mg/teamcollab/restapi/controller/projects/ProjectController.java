@@ -2,6 +2,7 @@ package mg.teamcollab.restapi.controller.projects;
 
 import mg.teamcollab.restapi.dto.projects.ProjectCreateDTO;
 import mg.teamcollab.restapi.dto.projects.ProjectResponseDTO;
+import mg.teamcollab.restapi.dto.projects.ProjectStatisticsDTO;
 import mg.teamcollab.restapi.model.projects.Project;
 import mg.teamcollab.restapi.service.projects.ProjectService;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +48,7 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/property")
     public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable Long id) throws Exception {
 
         ProjectResponseDTO dto = projectService.findProjectById(id);
@@ -57,6 +58,11 @@ public class ProjectController {
         dto.add(linkTo(methodOn(ProjectController.class).getAllProjects()).withRel("all-projects"));
 
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{id}/statistics")
+    public ResponseEntity<ProjectStatisticsDTO> getStatistics(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(projectService.getStatistics(id));
     }
 
 }

@@ -25,10 +25,10 @@ public class Task {
     @CreationTimestamp
     @Getter @Setter
     private LocalDateTime dueDate;
-    @Column(nullable = false, unique = true)
     @Getter @Setter
     private Long assignedUser;
-
+    @Getter @Setter
+    private Long projectId;
     public Task(String title, String status, Long userId) {
         this.setTitle(title);
         this.setStatus(status);
