@@ -1,7 +1,7 @@
 package mg.teamcollab.restapi.service.projectmembers;
 
 import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberCreateDTO;
-import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberReadDTO;
+import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberResponseDTO;
 import mg.teamcollab.restapi.mapper.projectmembers.ProjectMemberMapper;
 import mg.teamcollab.restapi.model.projectmembers.ProjectMember;
 import mg.teamcollab.restapi.model.projects.Project;
@@ -28,7 +28,7 @@ public class ProjectMemberService {
         this.projectMemberMapper = projectMemberMapper;
     }
 
-    public ProjectMemberReadDTO addMember(ProjectMemberCreateDTO dto) throws Exception {
+    public ProjectMemberResponseDTO addMember(ProjectMemberCreateDTO dto) throws Exception {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new Exception("User not found"));
 
