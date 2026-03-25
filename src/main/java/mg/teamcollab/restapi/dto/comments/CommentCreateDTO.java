@@ -1,4 +1,4 @@
-package mg.teamcollab.restapi.dto.comment;
+package mg.teamcollab.restapi.dto.comments;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package mg.teamcollab.restapi.dto.comment;
+package mg.teamcollab.restapi.dto.comments;
 
 import lombok.Data;
 

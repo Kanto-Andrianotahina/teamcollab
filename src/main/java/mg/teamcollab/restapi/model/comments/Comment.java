@@ -1,4 +1,4 @@
-package mg.teamcollab.restapi.model.comment;
+package mg.teamcollab.restapi.model.comments;
 
 import jakarta.persistence.*;
 import lombok.Getter;
