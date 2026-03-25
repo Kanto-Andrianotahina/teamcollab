@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/project-member")
+@RequestMapping("/api/project-member")
 public class ProjectMemberController {
 
     private final ProjectMemberService projectMemberService;
