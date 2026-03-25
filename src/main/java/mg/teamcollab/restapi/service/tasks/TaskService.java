@@ -2,6 +2,7 @@ package mg.teamcollab.restapi.service.tasks;
 
 import jakarta.transaction.Transactional;
 import mg.teamcollab.restapi.dto.tasks.TaskCreateDTO;
+import mg.teamcollab.restapi.dto.tasks.TaskDetailDTO;
 import mg.teamcollab.restapi.dto.tasks.TaskResponseDTO;
 import mg.teamcollab.restapi.mapper.tasks.TaskMapper;
 import mg.teamcollab.restapi.model.tasks.Task;
@@ -58,5 +59,11 @@ public class TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new Exception("task Not Found"));
         taskRepository.delete(task);
+    }
+
+    public TaskDetailDTO findTaskById(Long id) throws Exception {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new Exception("Task not found"));
+        return taskMapper.toDetailDTO(task);
     }
 }
