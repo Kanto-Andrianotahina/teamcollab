@@ -14,7 +14,7 @@ public class TaskMapper {
         taskResponseDTO.setTitle(task.getTitle());
         taskResponseDTO.setStatus(task.getStatus());
         taskResponseDTO.setAssignedDate(task.getDueDate());
-        taskResponseDTO.setUserId(taskResponseDTO.getUserId());
+        taskResponseDTO.setUserId(task.getAssignedUser());
         return taskResponseDTO;
     }
     public Task toTask(TaskCreateDTO dto) throws Exception {
