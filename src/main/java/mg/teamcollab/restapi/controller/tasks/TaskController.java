@@ -2,6 +2,7 @@ package mg.teamcollab.restapi.controller.tasks;
 
 import jakarta.validation.Valid;
 import mg.teamcollab.restapi.dto.tasks.TaskCreateDTO;
+import mg.teamcollab.restapi.dto.tasks.TaskDetailDTO;
 import mg.teamcollab.restapi.dto.tasks.TaskResponseDTO;
 import mg.teamcollab.restapi.model.tasks.Task;
 import mg.teamcollab.restapi.service.tasks.TaskService;
@@ -50,5 +51,11 @@ public class TaskController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteTask(@PathVariable long id) throws Exception {
         taskService.deleteTaskByKey(id);
+    }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<TaskDetailDTO> findTaskById(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(taskService.findTaskById(id));
     }
 }
