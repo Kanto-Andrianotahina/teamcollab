@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
@@ -33,5 +34,14 @@ public class TaskController {
     @ResponseStatus(HttpStatus.OK)
     public List<TaskResponseDTO> findAllTasks() {
         return taskService.findAllTasks();
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public TaskResponseDTO updateTask(@PathVariable long id, @Valid @RequestBody TaskCreateDTO dto) throws Exception {
+        if (dto == null) {
+            throw new Exception("Payload required");
+        }
+        return taskService.updateTask(id,dto);
     }
 }
