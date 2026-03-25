@@ -1,5 +1,6 @@
 package mg.teamcollab.restapi.controller.tasks;
 
+import jakarta.validation.Valid;
 import mg.teamcollab.restapi.dto.tasks.TaskCreateDTO;
 import mg.teamcollab.restapi.model.tasks.Task;
 import mg.teamcollab.restapi.service.tasks.TaskService;
@@ -19,7 +20,7 @@ public class TaskController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Task createTask(@RequestBody TaskCreateDTO dto) throws Exception {
+    public Task createTask(@Valid @RequestBody TaskCreateDTO dto) throws Exception {
         if (dto == null)
             throw new Exception("Payload required");
 
