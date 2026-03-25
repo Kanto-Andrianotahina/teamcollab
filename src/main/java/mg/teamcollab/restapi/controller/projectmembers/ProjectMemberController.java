@@ -2,7 +2,7 @@ package mg.teamcollab.restapi.controller.projectmembers;
 
 import jakarta.validation.Valid;
 import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberCreateDTO;
-import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberReadDTO;
+import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberResponseDTO;
 import mg.teamcollab.restapi.service.projectmembers.ProjectMemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +21,7 @@ public class ProjectMemberController {
     }
 
     @PostMapping
-    public ResponseEntity<ProjectMemberReadDTO> addMember(@Valid @RequestBody ProjectMemberCreateDTO dto) throws Exception {
+    public ResponseEntity<ProjectMemberResponseDTO> addMember(@Valid @RequestBody ProjectMemberCreateDTO dto) throws Exception {
         return ResponseEntity.ok(projectMemberService.addMember(dto));
     }
 }

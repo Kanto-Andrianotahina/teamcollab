@@ -1,7 +1,7 @@
 package mg.teamcollab.restapi.controller.projects;
 
 import mg.teamcollab.restapi.dto.projects.ProjectCreateDTO;
-import mg.teamcollab.restapi.dto.projects.ProjectReadDTO;
+import mg.teamcollab.restapi.dto.projects.ProjectResponseDTO;
 import mg.teamcollab.restapi.model.projects.Project;
 import mg.teamcollab.restapi.service.projects.ProjectService;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +29,12 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjectReadDTO>>getAllProjects() {
+    public ResponseEntity<List<ProjectResponseDTO>>getAllProjects() {
         return ResponseEntity.ok(projectService.findProjects());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectReadDTO> updateProject(@PathVariable long id, @RequestBody ProjectCreateDTO dto) throws Exception {
+    public ResponseEntity<ProjectResponseDTO> updateProject(@PathVariable long id, @RequestBody ProjectCreateDTO dto) throws Exception {
         if (dto == null) {
             throw new Exception("Payload required");
         }
@@ -48,9 +48,9 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectReadDTO> getProjectById(@PathVariable Long id) throws Exception {
+    public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable Long id) throws Exception {
 
-        ProjectReadDTO dto = projectService.findProjectById(id);
+        ProjectResponseDTO dto = projectService.findProjectById(id);
 
         //HATEOAS links
         dto.add(linkTo(methodOn(ProjectController.class).getProjectById(id)).withSelfRel());

@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 public class Task {
@@ -21,7 +22,7 @@ public class Task {
     private String status;
     @CreationTimestamp
     @Getter @Setter
-    private LocalDate dueDate;
+    private LocalDateTime dueDate;
     @Column(nullable = false, unique = true)
     @Getter @Setter
     private Long assignedUser;

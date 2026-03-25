@@ -1,7 +1,7 @@
 package mg.teamcollab.restapi.mapper.projects;
 
-import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberReadDTO;
-import mg.teamcollab.restapi.dto.projects.ProjectReadDTO;
+import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberResponseDTO;
+import mg.teamcollab.restapi.dto.projects.ProjectResponseDTO;
 import mg.teamcollab.restapi.mapper.projectmembers.ProjectMemberMapper;
 import mg.teamcollab.restapi.model.projects.Project;
 import mg.teamcollab.restapi.repository.projectmembers.ProjectMemberRepository;
@@ -16,14 +16,14 @@ public class ProjectMapper {
     ProjectMemberRepository projectMemberRepository;
     @Autowired
     private ProjectMemberMapper projectMemberMapper;
-    public ProjectReadDTO toDTO(Project p) {
-        ProjectReadDTO dto = new ProjectReadDTO();
+    public ProjectResponseDTO toDTO(Project p) {
+        ProjectResponseDTO dto = new ProjectResponseDTO();
         dto.setName(p.getName());
         dto.setDescription(p.getDescription());
         dto.setOwner(p.getOwnerId());
         dto.setCreatedAt(p.getCreatedAt());
 
-        List<ProjectMemberReadDTO> members = projectMemberRepository
+        List<ProjectMemberResponseDTO> members = projectMemberRepository
                 .findByProjectId(p.getId())
                 .stream()
                 .map(projectMemberMapper::toDTO)

@@ -1,8 +1,8 @@
 package mg.teamcollab.restapi.service.projects;
 
-import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberReadDTO;
+import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberResponseDTO;
 import mg.teamcollab.restapi.dto.projects.ProjectCreateDTO;
-import mg.teamcollab.restapi.dto.projects.ProjectReadDTO;
+import mg.teamcollab.restapi.dto.projects.ProjectResponseDTO;
 import mg.teamcollab.restapi.mapper.projectmembers.ProjectMemberMapper;
 import mg.teamcollab.restapi.mapper.projects.ProjectMapper;
 import mg.teamcollab.restapi.model.projectmembers.ProjectMember;
@@ -40,13 +40,13 @@ public class ProjectService {
         p.setCreatedAt(LocalDateTime.now());
         return projectRepository.save(p);
     }
-    public List<ProjectReadDTO> findProjects() {
+    public List<ProjectResponseDTO> findProjects() {
         return projectRepository.findAll()
                 .stream()
                 .map(projectMapper::toDTO)
                 .toList();
     }
-    public ProjectReadDTO udpateProjectByKey(Long id, ProjectCreateDTO dto) throws Exception {
+    public ProjectResponseDTO udpateProjectByKey(Long id, ProjectCreateDTO dto) throws Exception {
         if (dto == null) {
             throw  new Exception("Payload required");
         }
@@ -67,19 +67,19 @@ public class ProjectService {
                 .orElseThrow(() -> new Exception("Project Not Found"));
         projectRepository.delete(project);
     }
-    public ProjectReadDTO findProjectById(Long id) throws Exception {
+    public ProjectResponseDTO findProjectById(Long id) throws Exception {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new Exception("Project not found"));
 
         // mapper projet
-        ProjectReadDTO dto = projectMapper.toDTO(project);
+        ProjectResponseDTO dto = projectMapper.toDTO(project);
 
         //  get members
         List<ProjectMember> members = projectMemberRepository.findByProjectId(id);
 
         // mapping members
 
-        List<ProjectMemberReadDTO> memberDTOs = projectMemberRepository.findByProjectId(id)
+        List<ProjectMemberResponseDTO> memberDTOs = projectMemberRepository.findByProjectId(id)
                 .stream()
                 .map(projectMemberMapper::toDTO)
                 .toList();
