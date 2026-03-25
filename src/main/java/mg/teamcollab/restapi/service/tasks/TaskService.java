@@ -1,7 +1,6 @@
 package mg.teamcollab.restapi.service.tasks;
 
 import jakarta.transaction.Transactional;
-import mg.teamcollab.restapi.dto.projects.ProjectResponseDTO;
 import mg.teamcollab.restapi.dto.tasks.TaskCreateDTO;
 import mg.teamcollab.restapi.dto.tasks.TaskResponseDTO;
 import mg.teamcollab.restapi.mapper.tasks.TaskMapper;
@@ -37,6 +36,7 @@ public class TaskService {
                 .toList();
     }
 
+    @Transactional
     public TaskResponseDTO updateTask(Long id, TaskCreateDTO dto) throws Exception {
         if (dto == null) {
             throw new Exception("Payload Required");
@@ -50,5 +50,13 @@ public class TaskService {
         return taskMapper.toDTO(taskRepository.save(task));
     }
 
-
+    @Transactional
+    public void deleteTaskByKey(Long id) throws Exception {
+        if (id == null) {
+            throw  new Exception("Payload required");
+        }
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new Exception("task Not Found"));
+        taskRepository.delete(task);
+    }
 }

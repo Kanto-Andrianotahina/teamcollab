@@ -7,6 +7,7 @@ import mg.teamcollab.restapi.model.tasks.Task;
 import mg.teamcollab.restapi.service.tasks.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,5 +44,11 @@ public class TaskController {
             throw new Exception("Payload required");
         }
         return taskService.updateTask(id,dto);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteTask(@PathVariable long id) throws Exception {
+        taskService.deleteTaskByKey(id);
     }
 }
