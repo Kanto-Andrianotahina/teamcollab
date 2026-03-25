@@ -10,7 +10,7 @@ public class ProjectMemberMapper {
         ProjectMemberReadDTO dto = new ProjectMemberReadDTO();
         dto.setId(pm.getId());
         dto.setUserName(pm.getUser().getUsername());
-        dto.setRole(pm.getRole());
+        dto.setRole(pm.getRole().name());
         dto.setJoinedAt(pm.getJoinedAt());
         return dto;
     }

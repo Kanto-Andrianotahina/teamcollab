@@ -5,6 +5,7 @@ import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberCreateDTO;
 import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberReadDTO;
 import mg.teamcollab.restapi.service.projectmembers.ProjectMemberService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ public class ProjectMemberController {
     }
 
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ProjectMemberReadDTO> addMember(@Valid @RequestBody ProjectMemberCreateDTO dto) throws Exception {
         return ResponseEntity.ok(projectMemberService.addMember(dto));
     }

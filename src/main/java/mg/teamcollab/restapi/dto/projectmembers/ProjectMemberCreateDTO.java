@@ -2,7 +2,9 @@ package mg.teamcollab.restapi.dto.projectmembers;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
+@Data
 public class ProjectMemberCreateDTO {
     @NotNull(message = "User id is required")
     private Long userId;
@@ -13,27 +15,4 @@ public class ProjectMemberCreateDTO {
     @NotBlank(message = "Role is required")
     private String role;
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
 }

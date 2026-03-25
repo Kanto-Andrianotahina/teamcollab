@@ -3,6 +3,7 @@ package mg.teamcollab.restapi.model.projectmembers;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import mg.teamcollab.restapi.model.projectmembesrole.ProjectMemberRole;
 import mg.teamcollab.restapi.model.projects.Project;
 import mg.teamcollab.restapi.model.users.User;
 
@@ -32,8 +33,9 @@ public class ProjectMember {
     private Project project;
 
     @Setter  @Getter
-    @Column(nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
+    private ProjectMemberRole role;
 
     @Setter @Getter
     @Column(nullable = false, updatable = false)
