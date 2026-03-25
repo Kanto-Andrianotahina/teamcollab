@@ -7,8 +7,11 @@ import mg.teamcollab.restapi.dto.tasks.TaskResponseDTO;
 import mg.teamcollab.restapi.mapper.tasks.TaskMapper;
 import mg.teamcollab.restapi.model.tasks.Task;
 import mg.teamcollab.restapi.repository.tasks.TaskRepository;
+import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -30,10 +33,27 @@ public class TaskService {
         return taskRepository.save(t);
     }
 
-    public List<TaskResponseDTO> findAllTasks() {
-        return taskRepository.findAll()
-                .stream()
-                .map(taskMapper::toDTO)
+    public List<TaskResponseDTO> findAllTasks(String status, Long assignedUserId, LocalDate dueBefore) {
+        List<Task> tasks;
+
+        if (status != null) {
+            tasks = taskRepository.findByStatus(status);
+        } else if (assignedUserId != null) {
+            tasks = taskRepository.findByAssignedUser(assignedUserId);
+        } else if (dueBefore != null) {
+            // ✅ Convertir LocalDate → LocalDateTime pour la comparaison
+            tasks = taskRepository.findByDueDateBefore(dueBefore.atStartOfDay());
+        } else {
+            tasks = taskRepository.findAll();
+        }
+
+        return tasks.stream()
+                .map(task -> {
+                    TaskResponseDTO dto = taskMapper.toDTO(task);
+                    dto.add(Link.of("/api/tasks/" + dto.getId()).withSelfRel());
+                    dto.add(Link.of("/api/tasks/" + dto.getId() + "/comments").withRel("comments"));
+                    return dto;
+                })
                 .toList();
     }
 

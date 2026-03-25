@@ -3,11 +3,12 @@ package mg.teamcollab.restapi.dto.tasks;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
 
 @Data
-public class TaskResponseDTO {
+public class TaskResponseDTO  extends RepresentationModel<TaskResponseDTO> {
     @Getter @Setter
     private Long id;
     @Getter @Setter

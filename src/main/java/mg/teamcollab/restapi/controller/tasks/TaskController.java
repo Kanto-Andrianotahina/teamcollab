@@ -7,10 +7,13 @@ import mg.teamcollab.restapi.dto.tasks.TaskResponseDTO;
 import mg.teamcollab.restapi.model.tasks.Task;
 import mg.teamcollab.restapi.service.tasks.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -34,10 +37,13 @@ public class TaskController {
     }
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<TaskResponseDTO> findAllTasks() {
-        return taskService.findAllTasks();
-    }
+    public List<TaskResponseDTO> findAllTasks(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long assignedUserId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dueBefore) {
 
+        return taskService.findAllTasks(status, assignedUserId, dueBefore);
+    }
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public TaskResponseDTO updateTask(@PathVariable long id, @Valid @RequestBody TaskCreateDTO dto) throws Exception {
