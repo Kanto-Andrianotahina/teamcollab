@@ -30,11 +30,13 @@ public class TaskMapper {
         taskResponseDTO.setUserId(task.getAssignedUser());
         return taskResponseDTO;
     }
-    public Task toTask(TaskCreateDTO dto) throws Exception {
-        if (dto != null)
-            return new Task(dto.getTitle(),dto.getStatus(), dto.getUserId());
-
-        return null;
+    public Task toTask(TaskCreateDTO dto)  {
+       Task t = new Task();
+       t.setTitle(dto.getTitle());
+       t.setStatus(dto.getStatus());
+       t.setAssignedUser(dto.getUserId());
+       t.setProjectId(dto.getProjectId());
+       return t;
     }
 
     public TaskDetailDTO toDetailDTO(Task task) {
