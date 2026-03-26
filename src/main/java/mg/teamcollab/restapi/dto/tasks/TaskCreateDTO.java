@@ -12,4 +12,6 @@ public class TaskCreateDTO {
     private  String status;
     @NotNull(message = "User required")
     private  Long userId;
+    @NotNull(message = "Project required")
+    private Long projectId;
 }
