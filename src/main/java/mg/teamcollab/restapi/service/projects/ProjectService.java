@@ -33,7 +33,7 @@ public class ProjectService {
     private final ProjectAccessService projectAccessService;
     private final TaskRepository taskRepository;
 
-public ProjectService(ProjectRepository projectRepository, ProjectMapper projectMapper, ProjectMemberMapper projectMemberMapper, ProjectMemberRepository projectMemberRepository, TaskRepository taskRepository) {
+public ProjectService(ProjectRepository projectRepository, ProjectMapper projectMapper, ProjectMemberMapper projectMemberMapper, ProjectMemberRepository projectMemberRepository, TaskRepository taskRepository,ProjectAccessService projectAccessService) {
         this.projectRepository = projectRepository;
         this.projectMapper = projectMapper;
         this.projectMemberMapper = projectMemberMapper;
@@ -54,10 +54,6 @@ public ProjectService(ProjectRepository projectRepository, ProjectMapper project
         return projectRepository.save(p);
     }
     public List<ProjectResponseDTO> findProjects() {
-        return projectRepository.findAll()
-                .stream()
-
-    public List<ProjectReadDTO> findProjects() {
         User currentUser = projectAccessService.getCurrentUser();
 
         List<Project> projects;

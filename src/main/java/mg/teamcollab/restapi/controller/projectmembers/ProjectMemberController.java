@@ -22,9 +22,8 @@ public class ProjectMemberController {
     }
 
     @PostMapping
-    public ResponseEntity<ProjectMemberResponseDTO> addMember(@Valid @RequestBody ProjectMemberCreateDTO dto) throws Exception {
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ProjectMemberReadDTO> addMember(@Valid @RequestBody ProjectMemberCreateDTO dto) throws Exception {
+    public ResponseEntity<ProjectMemberResponseDTO> addMember(@Valid @RequestBody ProjectMemberCreateDTO dto) throws Exception {
         return ResponseEntity.ok(projectMemberService.addMember(dto));
     }
 }

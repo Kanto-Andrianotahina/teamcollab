@@ -22,6 +22,7 @@ public class SecurityUserConfig {
 
         private final JwtAuthFilter jwtAuthFilter;
         private final UserDetailsServiceImpl userDetailsService;
+        private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
         @Bean
         public PasswordEncoder passwordEncoder() {
@@ -40,8 +41,18 @@ public class SecurityUserConfig {
                     .csrf(csrf -> csrf.disable())
                     .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/api/auth/**", "/h2-console/**","/error","/v3/api-docs/**").permitAll()
+                            .requestMatchers(
+                                    "/api/auth/**",
+                                    "/h2-console/**",
+                                    "/error",
+                                    "/v3/api-docs/**",
+                                    "/swagger-ui/**",
+                                    "/swagger-ui.html"
+                            ).permitAll()
                             .anyRequest().authenticated()
+                    )
+                    .exceptionHandling(ex -> ex
+                            .accessDeniedHandler(customAccessDeniedHandler)
                     )
                     .sessionManagement(session -> session
                             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -59,4 +70,6 @@ public class SecurityUserConfig {
             provider.setPasswordEncoder(passwordEncoder());
             return provider;
         }
+
+
     }

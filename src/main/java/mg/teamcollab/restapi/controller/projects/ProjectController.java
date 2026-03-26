@@ -32,14 +32,13 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjectResponseDTO>>getAllProjects() {
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<ProjectReadDTO>>getAllProjects() {
+    public ResponseEntity<List<ProjectResponseDTO>>getAllProjects() {
         return ResponseEntity.ok(projectService.findProjects());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectReadDTO> updateProject(@PathVariable long id, @RequestBody ProjectCreateDTO dto) throws Exception {
+    public ResponseEntity<ProjectResponseDTO> updateProject(@PathVariable long id, @RequestBody ProjectCreateDTO dto) throws Exception {
         if (dto == null) {
             throw new Exception("Payload required");
         }
@@ -53,10 +52,8 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}/property")
-    public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable Long id) throws Exception {
-    @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ProjectReadDTO> getProjectById(@PathVariable Long id) throws Exception {
+    public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable Long id) throws Exception {
 
         ProjectResponseDTO dto = projectService.findProjectById(id);
 

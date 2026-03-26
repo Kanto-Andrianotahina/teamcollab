@@ -7,6 +7,7 @@ import mg.teamcollab.restapi.dto.tasks.TaskResponseDTO;
 import mg.teamcollab.restapi.mapper.tasks.TaskMapper;
 import mg.teamcollab.restapi.model.tasks.Task;
 import mg.teamcollab.restapi.repository.tasks.TaskRepository;
+import mg.teamcollab.restapi.service.projects.ProjectAccessService;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +19,13 @@ import java.util.List;
 public class TaskService {
     private final TaskRepository taskRepository;
     private  final TaskMapper taskMapper;
+    private final ProjectAccessService projectAccessService;
 
-    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper,
+                       ProjectAccessService projectAccessService) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
+        this.projectAccessService = projectAccessService;
     }
 
     @Transactional
@@ -29,6 +33,7 @@ public class TaskService {
         if (dto == null) {
             throw new Exception("Payload Required");
         }
+        projectAccessService.checkCanCreateTask(dto.getProjectId());
         Task t = taskMapper.toTask(dto);
         return taskRepository.save(t);
     }
@@ -78,6 +83,8 @@ public class TaskService {
         }
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new Exception("task Not Found"));
+
+        projectAccessService.checkCanDeleteTask(id);
         taskRepository.delete(task);
     }
 

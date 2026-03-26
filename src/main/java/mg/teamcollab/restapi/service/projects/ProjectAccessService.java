@@ -2,8 +2,10 @@ package mg.teamcollab.restapi.service.projects;
 
 import mg.teamcollab.restapi.model.projectmembers.ProjectMember;
 import mg.teamcollab.restapi.model.projectmembesrole.ProjectMemberRole;
+import mg.teamcollab.restapi.model.tasks.Task;
 import mg.teamcollab.restapi.model.users.User;
 import mg.teamcollab.restapi.repository.projectmembers.ProjectMemberRepository;
+import mg.teamcollab.restapi.repository.tasks.TaskRepository;
 import mg.teamcollab.restapi.repository.users.UserRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -14,11 +16,14 @@ import org.springframework.stereotype.Service;
 public class ProjectAccessService {
     private final UserRepository userRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final TaskRepository taskRepository;
 
     public ProjectAccessService(UserRepository userRepository,
-                                ProjectMemberRepository projectMemberRepository) {
+                                ProjectMemberRepository projectMemberRepository,
+                                TaskRepository taskRepository) {
         this.userRepository = userRepository;
         this.projectMemberRepository = projectMemberRepository;
+        this.taskRepository = taskRepository;
     }
 
     public User getCurrentUser() {
@@ -91,6 +96,46 @@ public class ProjectAccessService {
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public void checkCanCreateTask(Long projectId) {
+        User currentUser = getCurrentUser();
+
+        // ADMIN → OK
+        if (isAdmin(currentUser)) {
+            return;
+        }
+
+        // doit être membre du projet
+        ProjectMember membership = projectMemberRepository
+                .findByProjectIdAndUserId(projectId, currentUser.getId())
+                .orElseThrow(() -> new AccessDeniedException("You are not a member of this project"));
+
+        // seul LEAD
+        if (membership.getRole() != ProjectMemberRole.LEAD) {
+            throw new AccessDeniedException("Only LEAD can create tasks in this project ");
+        }
+    }
+
+    public void checkCanDeleteTask(Long taskId) throws Exception {
+        User currentUser = getCurrentUser();
+
+        if (isAdmin(currentUser)) {
+            return;
+        }
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new Exception("Task not found"));
+
+        Long projectId = task.getProjectId();
+
+        ProjectMember membership = projectMemberRepository
+                .findByUserIdAndProjectId(currentUser.getId(), projectId)
+                .orElseThrow(() -> new AccessDeniedException("You are not a member of this project"));
+
+        if (membership.getRole() != ProjectMemberRole.LEAD) {
+            throw new AccessDeniedException("Only LEAD or ADMIN can delete this task");
         }
     }
 }
