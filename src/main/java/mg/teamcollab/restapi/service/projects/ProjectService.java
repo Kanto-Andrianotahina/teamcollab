@@ -1,20 +1,26 @@
 package mg.teamcollab.restapi.service.projects;
 
-import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberReadDTO;
+import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberResponseDTO;
 import mg.teamcollab.restapi.dto.projects.ProjectCreateDTO;
-import mg.teamcollab.restapi.dto.projects.ProjectReadDTO;
+import mg.teamcollab.restapi.dto.projects.ProjectResponseDTO;
+import mg.teamcollab.restapi.dto.projects.ProjectStatisticsDTO;
+import mg.teamcollab.restapi.dto.tasks.TaskMembersDTO;
 import mg.teamcollab.restapi.mapper.projectmembers.ProjectMemberMapper;
 import mg.teamcollab.restapi.mapper.projects.ProjectMapper;
 import mg.teamcollab.restapi.model.projectmembers.ProjectMember;
 import mg.teamcollab.restapi.model.projects.Project;
+import mg.teamcollab.restapi.model.tasks.Task;
 import mg.teamcollab.restapi.repository.projectmembers.ProjectMemberRepository;
 import mg.teamcollab.restapi.repository.projects.ProjectRepository;
 import org.springframework.security.access.AccessDeniedException;
+import mg.teamcollab.restapi.repository.tasks.TaskRepository;
 import org.springframework.stereotype.Service;
 import mg.teamcollab.restapi.model.users.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,13 +31,15 @@ public class ProjectService {
     private final ProjectMemberMapper projectMemberMapper;
     private final ProjectMemberRepository projectMemberRepository;
     private final ProjectAccessService projectAccessService;
+    private final TaskRepository taskRepository;
 
-    public ProjectService(ProjectRepository projectRepository, ProjectMapper projectMapper, ProjectMemberMapper projectMemberMapper, ProjectMemberRepository projectMemberRepository, ProjectAccessService projectAccessService) {
+public ProjectService(ProjectRepository projectRepository, ProjectMapper projectMapper, ProjectMemberMapper projectMemberMapper, ProjectMemberRepository projectMemberRepository, TaskRepository taskRepository) {
         this.projectRepository = projectRepository;
         this.projectMapper = projectMapper;
         this.projectMemberMapper = projectMemberMapper;
         this.projectMemberRepository = projectMemberRepository;
         this.projectAccessService = projectAccessService;
+        this.taskRepository = taskRepository;
     }
 
     public Project createProject(ProjectCreateDTO dto) throws Exception {
@@ -45,6 +53,9 @@ public class ProjectService {
         p.setCreatedAt(LocalDateTime.now());
         return projectRepository.save(p);
     }
+    public List<ProjectResponseDTO> findProjects() {
+        return projectRepository.findAll()
+                .stream()
 
     public List<ProjectReadDTO> findProjects() {
         User currentUser = projectAccessService.getCurrentUser();
@@ -66,8 +77,7 @@ public class ProjectService {
                 .map(projectMapper::toDTO)
                 .toList();
     }
-
-    public ProjectReadDTO udpateProjectByKey(Long id, ProjectCreateDTO dto) throws Exception {
+    public ProjectResponseDTO udpateProjectByKey(Long id, ProjectCreateDTO dto) throws Exception {
         if (dto == null) {
             throw  new Exception("Payload required");
         }
@@ -109,7 +119,7 @@ public class ProjectService {
                 .orElseThrow(() -> new Exception("Project Not Found"));
         projectRepository.delete(project);
     }
-    public ProjectReadDTO findProjectById(Long id) throws Exception {
+    public ProjectResponseDTO findProjectById(Long id) throws Exception {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new Exception("Project not found"));
 
@@ -117,11 +127,14 @@ public class ProjectService {
         projectAccessService.checkCanViewProject(id);
 
         // mapper projet
-        ProjectReadDTO dto = projectMapper.toDTO(project);
+        ProjectResponseDTO dto = projectMapper.toDTO(project);
+
+        //  get members
+        List<ProjectMember> members = projectMemberRepository.findByProjectId(id);
 
         // mapping members
 
-        List<ProjectMemberReadDTO> memberDTOs = projectMemberRepository.findByProjectId(id)
+        List<ProjectMemberResponseDTO> memberDTOs = projectMemberRepository.findByProjectId(id)
                 .stream()
                 .map(projectMemberMapper::toDTO)
                 .toList();
@@ -129,5 +142,38 @@ public class ProjectService {
         dto.setMembers(memberDTOs);
 
         return dto;
+    }
+
+    public ProjectStatisticsDTO getStatistics(Long projectId) throws Exception {
+        projectRepository.findById(projectId)
+                .orElseThrow(() -> new Exception("Project not found"));
+
+        List<Task> tasks = taskRepository.findByProjectId(projectId);
+        List<ProjectMember> members = projectMemberRepository.findByProjectId(projectId);
+
+        Map<String, Long> tasksByStatus = tasks.stream()
+                .collect(Collectors.groupingBy(Task::getStatus, Collectors.counting()));
+
+        List<TaskMembersDTO> tasksByMember = members.stream()
+                .map(member -> {
+                    long count = tasks.stream()
+                            .filter(t -> t.getAssignedUser() != null &&
+                                    t.getAssignedUser().equals(member.getUser().getId()))
+                            .count();
+                    TaskMembersDTO dto = new TaskMembersDTO();
+                    dto.setUserId(member.getUser().getId());
+                    dto.setTaskCount(count);
+                    return dto;
+                })
+                .toList();
+
+        ProjectStatisticsDTO stats = new ProjectStatisticsDTO();
+        stats.setProjectId(projectId);
+        stats.setTotalTasks(tasks.size());
+        stats.setTasksByStatus(tasksByStatus);
+        stats.setTotalMembers(members.size());
+        stats.setTasksByMember(tasksByMember);
+
+        return stats;
     }
 }

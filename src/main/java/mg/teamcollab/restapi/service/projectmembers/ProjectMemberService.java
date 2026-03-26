@@ -1,7 +1,7 @@
 package mg.teamcollab.restapi.service.projectmembers;
 
 import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberCreateDTO;
-import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberReadDTO;
+import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberResponseDTO;
 import mg.teamcollab.restapi.mapper.projectmembers.ProjectMemberMapper;
 import mg.teamcollab.restapi.model.projectmembers.ProjectMember;
 import mg.teamcollab.restapi.model.projectmembesrole.ProjectMemberRole;
@@ -34,7 +34,7 @@ public class ProjectMemberService {
         this.projectAccessService = projectAccessService;
     }
 
-    public ProjectMemberReadDTO addMember(ProjectMemberCreateDTO dto) throws Exception {
+    public ProjectMemberResponseDTO addMember(ProjectMemberCreateDTO dto) throws Exception {
         System.out.println(">>> addMember START");
         System.out.println(">>> dto.userId = " + dto.getUserId());
         System.out.println(">>> dto.projectId = " + dto.getProjectId());

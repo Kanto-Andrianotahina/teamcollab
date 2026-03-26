@@ -1,7 +1,8 @@
 package mg.teamcollab.restapi.controller.projects;
 
 import mg.teamcollab.restapi.dto.projects.ProjectCreateDTO;
-import mg.teamcollab.restapi.dto.projects.ProjectReadDTO;
+import mg.teamcollab.restapi.dto.projects.ProjectResponseDTO;
+import mg.teamcollab.restapi.dto.projects.ProjectStatisticsDTO;
 import mg.teamcollab.restapi.model.projects.Project;
 import mg.teamcollab.restapi.service.projects.ProjectService;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/projects")
+@RequestMapping("/api/projects")
 public class ProjectController {
     private final ProjectService projectService;
 
@@ -31,13 +32,13 @@ public class ProjectController {
     }
 
     @GetMapping
+    public ResponseEntity<List<ProjectResponseDTO>>getAllProjects() {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ProjectReadDTO>>getAllProjects() {
         return ResponseEntity.ok(projectService.findProjects());
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ProjectReadDTO> updateProject(@PathVariable long id, @RequestBody ProjectCreateDTO dto) throws Exception {
         if (dto == null) {
             throw new Exception("Payload required");
@@ -46,23 +47,29 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteProject(@PathVariable long id) throws Exception {
         projectService.deleteProjectByKey(id);
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{id}/property")
+    public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable Long id) throws Exception {
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ProjectReadDTO> getProjectById(@PathVariable Long id) throws Exception {
 
-        ProjectReadDTO dto = projectService.findProjectById(id);
+        ProjectResponseDTO dto = projectService.findProjectById(id);
 
         //HATEOAS links
         dto.add(linkTo(methodOn(ProjectController.class).getProjectById(id)).withSelfRel());
         dto.add(linkTo(methodOn(ProjectController.class).getAllProjects()).withRel("all-projects"));
 
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{id}/statistics")
+    public ResponseEntity<ProjectStatisticsDTO> getStatistics(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(projectService.getStatistics(id));
     }
 
 }
