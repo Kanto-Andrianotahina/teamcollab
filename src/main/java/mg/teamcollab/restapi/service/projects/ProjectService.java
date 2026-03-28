@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
@@ -46,12 +45,16 @@ public ProjectService(ProjectRepository projectRepository, ProjectMapper project
         if (dto == null) {
             throw  new Exception("Payload required");
         }
-        Project p = new Project();
-        p.setName(dto.getName());
-        p.setDescription(dto.getDescription());
-        p.setOwnerId(dto.getOwner());
-        p.setCreatedAt(LocalDateTime.now());
-        return projectRepository.save(p);
+
+        User currentUser = projectAccessService.getCurrentUser();
+        Project project = new Project();
+        Long owner = currentUser.getId();
+        project.setName(dto.getName());
+        project.setDescription(dto.getDescription());
+        if (dto.getOwner() != null) owner = dto.getOwner() ;
+        project.setOwnerId(owner);
+        project.setCreatedAt(LocalDateTime.now());
+        return projectRepository.save(project);
     }
     public List<ProjectResponseDTO> findProjects() {
         User currentUser = projectAccessService.getCurrentUser();
@@ -83,9 +86,13 @@ public ProjectService(ProjectRepository projectRepository, ProjectMapper project
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new Exception("Project Not Found"));
 
+
+        User currentUser = projectAccessService.getCurrentUser();
+        Long owner = currentUser.getId();
         project.setName(dto.getName());
         project.setDescription(dto.getDescription());
-        project.setOwnerId(dto.getOwner());
+        if (dto.getOwner() != null) owner = dto.getOwner() ;
+        project.setOwnerId(owner);
         project.setCreatedAt(LocalDateTime.now());
         return projectMapper.toDTO(projectRepository.save(project));
 
@@ -143,6 +150,7 @@ public ProjectService(ProjectRepository projectRepository, ProjectMapper project
     public ProjectStatisticsDTO getStatistics(Long projectId) throws Exception {
         projectRepository.findById(projectId)
                 .orElseThrow(() -> new Exception("Project not found"));
+        projectAccessService.checkCanViewProject(projectId);
 
         List<Task> tasks = taskRepository.findByProjectId(projectId);
         List<ProjectMember> members = projectMemberRepository.findByProjectId(projectId);

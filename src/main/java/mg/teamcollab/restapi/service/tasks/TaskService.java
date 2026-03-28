@@ -67,6 +67,7 @@ public class TaskService {
         if (dto == null) {
             throw new Exception("Payload Required");
         }
+        projectAccessService.checkCanAccessTask(id);
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new Exception("Task Not Found"));
         task.setTitle(dto.getTitle());
@@ -91,6 +92,8 @@ public class TaskService {
     public TaskDetailDTO findTaskById(Long id) throws Exception {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new Exception("Task not found"));
+
+        projectAccessService.checkCanAccessTask(id);
         return taskMapper.toDetailDTO(task);
     }
 }

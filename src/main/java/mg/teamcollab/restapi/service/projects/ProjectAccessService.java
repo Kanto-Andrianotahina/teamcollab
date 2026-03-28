@@ -101,12 +101,10 @@ public class ProjectAccessService {
 
     public void checkCanCreateTask(Long projectId) {
         User currentUser = getCurrentUser();
-
-        // ADMIN → OK
+// ADMIN → OK
         if (isAdmin(currentUser)) {
             return;
         }
-
         // doit être membre du projet
         ProjectMember membership = projectMemberRepository
                 .findByProjectIdAndUserId(projectId, currentUser.getId())
@@ -116,6 +114,8 @@ public class ProjectAccessService {
         if (membership.getRole() != ProjectMemberRole.LEAD) {
             throw new AccessDeniedException("Only LEAD can create tasks in this project ");
         }
+
+
     }
 
     public void checkCanDeleteTask(Long taskId) throws Exception {
@@ -137,5 +137,28 @@ public class ProjectAccessService {
         if (membership.getRole() != ProjectMemberRole.LEAD) {
             throw new AccessDeniedException("Only LEAD or ADMIN can delete this task");
         }
+    }
+
+    public void checkCanAccessTask(Long taskId) throws Exception {
+        User currentUser = getCurrentUser();
+        if (isAdmin(currentUser)) {
+            return;
+        }
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new Exception("Task not found"));
+
+        Long projectId = task.getProjectId();
+
+        boolean isMember = projectMemberRepository
+                .existsByUserIdAndProjectId(currentUser.getId(), projectId);
+
+        if (!isMember) {
+            throw new AccessDeniedException("You are not a member of this project");
+        }
+    }
+
+    public void checkCanCommentTask(Long taskId) throws Exception {
+        checkCanAccessTask(taskId);
     }
 }

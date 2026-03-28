@@ -8,8 +8,10 @@ import mg.teamcollab.restapi.dto.tasks.TaskResponseDTO;
 import mg.teamcollab.restapi.dto.users.UserResponseDTO;
 import mg.teamcollab.restapi.mapper.comments.CommentMapper;
 import mg.teamcollab.restapi.model.tasks.Task;
+import mg.teamcollab.restapi.model.users.User;
 import mg.teamcollab.restapi.repository.comments.CommentRepository;
 import mg.teamcollab.restapi.repository.users.UserRepository;
+import mg.teamcollab.restapi.service.projects.ProjectAccessService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public class TaskMapper {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
+    ProjectAccessService projectAccessService;
 
     public TaskResponseDTO toDTO(Task task) {
         TaskResponseDTO taskResponseDTO = new TaskResponseDTO();
@@ -31,10 +34,14 @@ public class TaskMapper {
         return taskResponseDTO;
     }
     public Task toTask(TaskCreateDTO dto)  {
-       Task t = new Task();
+        Task t = new Task();
+
+        User currentUser = projectAccessService.getCurrentUser();
+        Long owner = currentUser.getId();
+        if (dto.getUserId() != null) owner = dto.getUserId();
        t.setTitle(dto.getTitle());
        t.setStatus(dto.getStatus());
-       t.setAssignedUser(dto.getUserId());
+       t.setAssignedUser(owner);
        t.setProjectId(dto.getProjectId());
        return t;
     }

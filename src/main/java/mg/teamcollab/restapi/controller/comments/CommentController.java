@@ -28,7 +28,7 @@ public class CommentController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<CommentResponseDTO>> getComments(@PathVariable Long taskId) {
+    public ResponseEntity<List<CommentResponseDTO>> getComments(@PathVariable Long taskId) throws Exception {
         return ResponseEntity.ok(commentService.getCommentsByTask(taskId));
     }
 }
