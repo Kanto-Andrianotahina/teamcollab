@@ -5,6 +5,8 @@ import mg.teamcollab.restapi.dto.projects.ProjectCreateDTO;
 import mg.teamcollab.restapi.dto.projects.ProjectResponseDTO;
 import mg.teamcollab.restapi.dto.projects.ProjectStatisticsDTO;
 import mg.teamcollab.restapi.dto.tasks.TaskMembersDTO;
+import mg.teamcollab.restapi.exception.BadRequestException;
+import mg.teamcollab.restapi.exception.NotFoundException;
 import mg.teamcollab.restapi.mapper.projectmembers.ProjectMemberMapper;
 import mg.teamcollab.restapi.mapper.projects.ProjectMapper;
 import mg.teamcollab.restapi.model.projectmembers.ProjectMember;
@@ -32,7 +34,11 @@ public class ProjectService {
     private final ProjectAccessService projectAccessService;
     private final TaskRepository taskRepository;
 
-public ProjectService(ProjectRepository projectRepository, ProjectMapper projectMapper, ProjectMemberMapper projectMemberMapper, ProjectMemberRepository projectMemberRepository, TaskRepository taskRepository,ProjectAccessService projectAccessService) {
+    public ProjectService(ProjectRepository projectRepository, ProjectMapper projectMapper,
+                          ProjectMemberMapper projectMemberMapper,
+                          ProjectMemberRepository projectMemberRepository,
+                          TaskRepository taskRepository,
+                          ProjectAccessService projectAccessService) {
         this.projectRepository = projectRepository;
         this.projectMapper = projectMapper;
         this.projectMemberMapper = projectMemberMapper;
@@ -41,9 +47,9 @@ public ProjectService(ProjectRepository projectRepository, ProjectMapper project
         this.taskRepository = taskRepository;
     }
 
-    public Project createProject(ProjectCreateDTO dto) throws Exception {
+    public Project createProject(ProjectCreateDTO dto) throws Exception{
         if (dto == null) {
-            throw  new Exception("Payload required");
+            throw new BadRequestException("Payload requis");
         }
 
         User currentUser = projectAccessService.getCurrentUser();
@@ -51,11 +57,12 @@ public ProjectService(ProjectRepository projectRepository, ProjectMapper project
         Long owner = currentUser.getId();
         project.setName(dto.getName());
         project.setDescription(dto.getDescription());
-        if (dto.getOwner() != null) owner = dto.getOwner() ;
+        if (dto.getOwner() != null) owner = dto.getOwner();
         project.setOwnerId(owner);
         project.setCreatedAt(LocalDateTime.now());
         return projectRepository.save(project);
     }
+
     public List<ProjectResponseDTO> findProjects() {
         User currentUser = projectAccessService.getCurrentUser();
 
@@ -65,7 +72,6 @@ public ProjectService(ProjectRepository projectRepository, ProjectMapper project
             projects = projectRepository.findAll();
         } else {
             List<ProjectMember> memberships = projectMemberRepository.findByUserId(currentUser.getId());
-
             projects = memberships.stream()
                     .map(ProjectMember::getProject)
                     .distinct()
@@ -76,66 +82,51 @@ public ProjectService(ProjectRepository projectRepository, ProjectMapper project
                 .map(projectMapper::toDTO)
                 .toList();
     }
-    public ProjectResponseDTO udpateProjectByKey(Long id, ProjectCreateDTO dto) throws Exception {
+
+    public ProjectResponseDTO udpateProjectByKey(Long id, ProjectCreateDTO dto) throws Exception{
         if (dto == null) {
-            throw  new Exception("Payload required");
+            throw new BadRequestException("Payload requis");
         }
 
         projectAccessService.checkCanManageProject(id);
 
         Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new Exception("Project Not Found"));
-
+                .orElseThrow(() -> new NotFoundException("Projet introuvable : " + id));
 
         User currentUser = projectAccessService.getCurrentUser();
         Long owner = currentUser.getId();
         project.setName(dto.getName());
         project.setDescription(dto.getDescription());
-        if (dto.getOwner() != null) owner = dto.getOwner() ;
+        if (dto.getOwner() != null) owner = dto.getOwner();
         project.setOwnerId(owner);
         project.setCreatedAt(LocalDateTime.now());
         return projectMapper.toDTO(projectRepository.save(project));
-
-        /* Project updatedProject = projectRepository.save(project);
-
-        ProjectReadDTO dtoResult = projectMapper.toDTO(updatedProject);
-
-        List<ProjectMemberReadDTO> memberDTOs = projectMemberRepository.findByProjectId(id)
-                .stream()
-                .map(projectMemberMapper::toDTO)
-                .toList();
-
-        dtoResult.setMembers(memberDTOs); */
     }
-    public void deleteProjectByKey(Long id) throws Exception {
+
+    public void deleteProjectByKey(Long id) {
         if (id == null) {
-            throw  new Exception("Payload required");
+            throw new BadRequestException("L'identifiant du projet est requis");
         }
 
         User currentUser = projectAccessService.getCurrentUser();
 
         if (!projectAccessService.isAdmin(currentUser)) {
-            throw new AccessDeniedException("Only ADMIN can delete a project");
+            throw new AccessDeniedException("Seul un ADMIN peut supprimer un projet");
         }
 
         Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new Exception("Project Not Found"));
+                .orElseThrow(() -> new NotFoundException("Projet introuvable : " + id));
+
         projectRepository.delete(project);
     }
-    public ProjectResponseDTO findProjectById(Long id) throws Exception {
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new Exception("Project not found"));
 
-        // ADMIN ou membre du projet
+    public ProjectResponseDTO findProjectById(Long id) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Projet introuvable : " + id));
+
         projectAccessService.checkCanViewProject(id);
 
-        // mapper projet
         ProjectResponseDTO dto = projectMapper.toDTO(project);
-
-        //  get members
-        List<ProjectMember> members = projectMemberRepository.findByProjectId(id);
-
-        // mapping members
 
         List<ProjectMemberResponseDTO> memberDTOs = projectMemberRepository.findByProjectId(id)
                 .stream()
@@ -143,13 +134,13 @@ public ProjectService(ProjectRepository projectRepository, ProjectMapper project
                 .toList();
 
         dto.setMembers(memberDTOs);
-
         return dto;
     }
 
-    public ProjectStatisticsDTO getStatistics(Long projectId) throws Exception {
+    public ProjectStatisticsDTO getStatistics(Long projectId) {
         projectRepository.findById(projectId)
-                .orElseThrow(() -> new Exception("Project not found"));
+                .orElseThrow(() -> new NotFoundException("Projet introuvable : " + projectId));
+
         projectAccessService.checkCanViewProject(projectId);
 
         List<Task> tasks = taskRepository.findByProjectId(projectId);

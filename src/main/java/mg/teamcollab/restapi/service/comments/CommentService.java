@@ -3,6 +3,7 @@ package mg.teamcollab.restapi.service.comments;
 import lombok.RequiredArgsConstructor;
 import mg.teamcollab.restapi.dto.comments.CommentCreateDTO;
 import mg.teamcollab.restapi.dto.comments.CommentResponseDTO;
+import mg.teamcollab.restapi.exception.NotFoundException;
 import mg.teamcollab.restapi.mapper.comments.CommentMapper;
 import mg.teamcollab.restapi.model.comments.Comment;
 import mg.teamcollab.restapi.model.tasks.Task;
@@ -23,26 +24,29 @@ public class CommentService {
     private final CommentMapper commentMapper;
     private final ProjectAccessService projectAccessService;
 
-
     public CommentResponseDTO addComment(Long taskId, CommentCreateDTO dto) throws Exception {
-
         projectAccessService.checkCanCommentTask(taskId);
+
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new Exception("Task not found"));
+                .orElseThrow(() -> new NotFoundException("Tâche introuvable : " + taskId));
+
+        User currentUser = projectAccessService.getCurrentUser();
 
         Comment comment = new Comment();
-        User currentUser = projectAccessService.getCurrentUser();
         comment.setAuthorId(currentUser.getId());
         comment.setContent(dto.getContent());
-        //comment.setAuthorId(dto.getAuthorId());
         comment.setTask(task);
 
         return commentMapper.toDTO(commentRepository.save(comment));
     }
 
     public List<CommentResponseDTO> getCommentsByTask(Long taskId) throws Exception {
-
         projectAccessService.checkCanCommentTask(taskId);
+
+        // Vérifier que la tâche existe
+        taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Tâche introuvable : " + taskId));
+
         return commentRepository.findByTaskId(taskId)
                 .stream()
                 .map(commentMapper::toDTO)
