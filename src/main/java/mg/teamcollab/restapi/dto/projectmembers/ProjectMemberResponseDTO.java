@@ -5,7 +5,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-public class ProjectMemberReadDTO {
+public class ProjectMemberResponseDTO {
     @Setter @Getter
     private Long id;
     @Setter @Getter

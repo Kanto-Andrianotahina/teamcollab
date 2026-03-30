@@ -2,13 +2,13 @@ package mg.teamcollab.restapi.dto.projects;
 
 import lombok.Getter;
 import lombok.Setter;
-import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberReadDTO;
+import mg.teamcollab.restapi.dto.projectmembers.ProjectMemberResponseDTO;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class ProjectReadDTO extends RepresentationModel<ProjectReadDTO> {
+public class ProjectResponseDTO extends RepresentationModel<ProjectResponseDTO> {
     @Setter
     public String name;
     @Setter
@@ -19,5 +19,5 @@ public class ProjectReadDTO extends RepresentationModel<ProjectReadDTO> {
     public LocalDateTime createdAt;
 
     @Setter @Getter
-    private List<ProjectMemberReadDTO> members;
+    private List<ProjectMemberResponseDTO> members;
 }

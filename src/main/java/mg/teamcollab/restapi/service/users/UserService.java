@@ -28,12 +28,30 @@ public class UserService {
             throw new BadRequestException("Email déjà utilisé : " + request.getEmail());
         }
 
+        Role role;
+
+        if (request.getRole() == null || request.getRole().isBlank()) {
+            role = Role.MEMBER;
+        } else {
+            try {
+                role = Role.valueOf(request.getRole().toUpperCase());
+            } catch (Exception e) {
+                throw new BadRequestException("Invalid role: " + request.getRole());
+            }
+        }
+
+        // sécurité
+        //if (role == Role.ADMIN) {
+         //   throw new BadRequestException("Cannot assign ADMIN role");
+        //}
+
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.MEMBER)
+                .role(role)
                 .build();
+
 
         return UserResponseDTO.from(userRepository.save(user));
     }

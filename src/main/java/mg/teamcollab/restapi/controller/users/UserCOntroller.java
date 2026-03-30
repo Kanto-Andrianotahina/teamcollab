@@ -6,6 +6,7 @@ import mg.teamcollab.restapi.dto.users.UpdateUserRequestDTO;
 import mg.teamcollab.restapi.dto.users.UserResponseDTO;
 import mg.teamcollab.restapi.service.users.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class UserCOntroller {
     private final UserService userService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponseDTO>> findAll() {
         return ResponseEntity.ok(userService.findAll());
     }
